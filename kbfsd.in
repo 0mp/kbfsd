@@ -1,0 +1,119 @@
+#! /bin/sh -
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Copyright (c) 2018 Mateusz Piotrowski <0mp@FreeBSD.org>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright notice,
+#        this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+# PROVIDE: kbfsd
+# REQUIRE: DAEMON LOGIN NETWORKING
+
+. /etc/rc.subr
+
+name='kbfsd'
+rcvar='kbfsd_enable'
+
+load_rc_config 'kbfsd'
+
+# Default settings.
+: "${kbfsd_enable:=no}"
+: "${kbfsd_mountpoint:=/keybase}"
+: "${kbfsd_user:?'kbfsd_user cannot be empty.'}"
+# It has to be done manually because the su(1) mechanism present in rc.subr(8)
+# uses the "-m" flag, which causes kbfsfuse to look for files in root's
+# directories instead of the directories of ${kbfsd_user}.
+: "${kbfsd_env:="HOME=/home/${kbfsd_user}"}"
+: "${kbfsd_keybase_username:="${kbfsd_user}"}"
+
+# This location is a popular one for other Keybase-related files.
+pidfile="/home/${kbfsd_user}/.config/keybase/kbfsd.${kbfsd_user}.pid"
+
+# The "procname" variable has to be set because we use daemon(8) here and the
+# process name does not match the "command" variable.
+procname='%%LOCALBASE%%/bin/kbfsfuse'
+command='/usr/sbin/daemon'
+command_args="-p ${pidfile} %%LOCALBASE%%/bin/kbfsfuse -log-to-file ${kbfsd_mountpoint}"
+
+start_precmd="kbfsd_prestart"
+stop_postcmd="kbfsd_poststop"
+
+required_modules='fuse'
+
+kbfsd_prestart()
+{
+	local _f
+
+	# Make sure that the username is valid.
+	if ! id -u -- "${kbfsd_user}" > /dev/null 2>&1; then
+		err 1 "kbfsd_user is set to '${kbfsd_user}' which is not a valid user."
+	fi
+
+	# Attempt to unmount in case there are some leftovers after
+	# previous kbfsfuse.
+	umount "${kbfsd_mountpoint}" > /dev/null 2>&1
+	# Create the mountpoint for the filesystem.
+	if ! mkdir -p -- "${kbfsd_mountpoint}"; then
+		err 1 "Cannot create the '${kbfsd_mountpoint}' directory.'"
+	fi
+	if ! chown "${kbfsd_user}" "${kbfsd_mountpoint}"; then
+		err 1 "Cannot set ${kbfsd_user} as the owner of ${kbfsd_mountpoint}."
+	fi
+
+	# Make it possible to mount filesystems as a normal user.
+	if ! sysctl vfs.usermount=1 > /dev/null 2>&1; then
+		err 1 "Cannot set vfs.usermount to 1."
+	fi
+
+	# Add the specified user account to the opearator group so that it
+	# could use the /dev/fuse device.
+	if ! pw groupmod operator -m "${kbfsd_user}"; then
+		err 1 "Cannot add ${kbfsd_user} to the operator group."
+	fi
+
+	# The Keybase client has to be initiated so that
+	# "/home/${kbfsd_user}/.config/keybase/keybased.sock" and
+	# "/home/${kbfsd_user}/.config/keybase/kbfsd.sock" are present.
+	su -l "${kbfsd_user}" -c "%%LOCALBASE%%/bin/keybase login ${kbfsd_keybase_username}" > /dev/null 2>&1
+	su -l "${kbfsd_user}" -c "%%LOCALBASE%%/bin/keybase fs ls ${kbfsd_mountpoint} > /dev/null 2>&1"
+	for _f in \
+	    "/home/${kbfsd_user}/.config/keybase/kbfsd.sock" \
+	    "/home/${kbfsd_user}/.config/keybase/keybased.sock"
+	do
+		if [ ! -S "${_f}" ]; then
+			err 1 "Missing the \"${_f}\" file."
+		fi
+	done
+
+	return 0
+}
+
+kbfsd_poststop()
+{
+	# Attempt to unmount in case there are some leftovers terminating
+	# kbfsfuse too rapidly.
+	umount "${kbfsd_mountpoint}" > /dev/null 2>&1
+}
+
+run_rc_command "$1"
+
+# vim: filetype=sh softtabstop=8 shiftwidth=8 tabstop=8 noexpandtab
