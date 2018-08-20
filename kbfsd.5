@@ -1,0 +1,147 @@
+.\"
+.\" SPDX-License-Identifier: BSD-2-Clause
+.\"
+.\" Copyright (c) 2018 Mateusz Piotrowski <0mp@FreeBSD.org>
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions are met:
+.\"
+.\" 1. Redistributions of source code must retain the above copyright notice,
+.\"    this list of conditions and the following disclaimer.
+.\"
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+.\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.Dd August 20, 2018
+.Dt KBFSD 5
+.Os
+.Sh NAME
+.Nm kbfsd
+.Nd service daemon for the Keybase filesystem (KBFS)
+.Sh SYNOPSIS
+The required
+.Xr rc.conf 5
+variables:
+.Bl -item -compact
+.It
+.Va kbfsd_enable Ns = Ns Qq Li NO
+.It
+.Va kbfsd_user Ns = Ns Qq Ar user
+.El
+.Pp
+Optional
+.Xr rc.conf 5
+variables:
+.Bl -item -compact
+.It
+.Va kbfsd_keybase_username Ns = Ns Qq Li "${" Ns Va kbfsd_user Ns Li "}"
+.It
+.Va kbfsd_mountpoint Ns = Ns Qq Pa /keybase
+.El
+.Sh DESCRIPTION
+.Nm
+is an
+.Xr rc 8
+daemon for the Keybase filesystem (KBFS).
+.Pp
+.Nm
+has to configure some bits of the system in order to mount KBFS as
+.Va kbfsd_user .
+.Va kbfsd_mountpoint
+is created and
+the
+.Xr sysctl 8
+tunable
+.Va vfs.usermount
+is set to
+.Dq 1
+so that
+.Va kbfsd_user
+could mount
+.Va kbfsd_mountpoint .
+Then
+.Va kbfsd_user
+is added to the
+.Dq operator
+group to be able to use the
+.Pa /dev/fuse
+device.
+Finally,
+.Nm
+attempts to spin off the Keybase server and create required socket files.
+Note that this step requires
+.Va kbfsd_user
+to be able to log in as
+.Va kbfsd_keybase_username .
+This should be possible once
+.Va kbfsd_user
+registers a device with
+.Dq Li keybase device add .
+.Pp
+.Nm
+may be controlled with the following
+.Xr rc.conf 5
+variables:
+.Bl -tag -width kbfsd_keybase_username
+.It Va kbfsd_enable
+.Pq Vt bool , No default: Dq Li NO
+Run
+.Nm .
+.It Va kbfsd_keybase_username
+.Pq Vt str , No default: Va kbfsd_user
+The username used to log into Keybase.
+.It Va kbfsd_mountpoint
+.Pq Vt str , No default: Dq Li /keybase
+The directory where KBFS should be mounted.
+.It Va kbfsd_user
+.Pq Vt str , No no defaults
+The login name of a user, who should own
+.Va kbfsd_mountpoint .
+It cannot be empty.
+.El
+.Sh FILES
+.Bl -tag -width "/home/${kbfsd_user}/.config/keybase/kbfsd.${kbfsd_user}.pid" -compact
+.It Pa "/home/${kbfsd_user}/.config/keybase/kbfsd.${kbfsd_user}.pid"
+PID file.
+.El
+.Sh EXIT STATUS
+The
+.Nm
+daemon
+exits 0 on success, and >0 if an error occurs.
+.Sh SEE ALSO
+.Xr rc.conf 5 ,
+.Xr mount 8 ,
+.Xr rc 8
+.Sh AUTHORS
+The
+.Nm
+daemon and its manual page were written by
+.An Mateusz Piotrowski Aq Mt 0mp@FreeBSD.org .
+.Sh BUGS
+.Nm
+seems to kill
+.Nm kbfsfuse
+too rapidly for
+.Nm kbfsfuse
+to properly unmount.
+As a workaround,
+.Nm
+calls
+.Xr umount 8
+on the mount point in the
+.Em poststop
+phase
+.Pq see Xr rc.subr 8
