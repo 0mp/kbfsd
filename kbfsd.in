@@ -27,6 +27,7 @@
 
 # PROVIDE: kbfsd
 # REQUIRE: DAEMON LOGIN NETWORKING
+# KEYWORD: nostart
 
 . /etc/rc.subr
 

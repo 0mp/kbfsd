@@ -61,6 +61,17 @@ It takes care of the configuration the Keybase user would have to do manually
 otherwise.
 .Pp
 .Nm
+does not start automatically even when
+.Va kbfsd_enable
+is set to
+.Dq Li YES
+in
+.Xr rc.conf 5 .
+See the
+.Sx CAVEATS
+section for more details.
+.Pp
+.Nm
 has to configure some bits of the system in order to mount KBFS as
 .Va kbfsd_user .
 .Va kbfsd_mountpoint
@@ -134,6 +145,21 @@ The
 .Nm
 daemon and its manual page were written by
 .An Mateusz Piotrowski Aq Mt 0mp@FreeBSD.org .
+.Sh CAVEATS
+.Nm
+is
+.Em not
+started automatically together with other daemons during boot because it uses
+the
+.Dq Li nostart
+KEYWORD
+.Pq see Xr rc 8 for details .
+The reason is that in order to reliably mount KBFS the user has to be establish
+a session with the Keybase server first.
+This is done by calling:
+.Dq Li keybase login Ar username .
+Unfortunately, this command happens to block the booting process from time to
+time, which is unacceptable.
 .Sh BUGS
 .Nm
 seems to kill
