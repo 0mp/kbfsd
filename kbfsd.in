@@ -109,7 +109,7 @@ kbfsd_prestart()
 
 kbfsd_poststop()
 {
-	# Attempt to unmount in case there are some leftovers terminating
+	# Attempt to unmount in case there are some leftovers after terminating
 	# kbfsfuse too rapidly.
 	umount "${kbfsd_mountpoint}" > /dev/null 2>&1
 }
