@@ -175,3 +175,16 @@ on the mount point in the
 .Em poststop
 phase
 .Pq see Xr rc.subr 8 .
+.Pp
+Currently,
+.Nm
+uses
+.Va kbfsd_env
+internally to set the
+.Ev HOME
+environmental variable to the home directory of
+.Va kbfsd_user .
+It is recommended to read the service file before setting
+.Va kbfsd_env
+in
+.Xr rc.conf 5 .
