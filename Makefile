@@ -47,3 +47,7 @@ install: kbfsd
 .PHONY: clean
 clean:
 	rm -f -- kbfsd
+
+.PHONY: regenerate-readme
+regenerate-readme:
+	mandoc -Tmarkdown kbfsd.5 | awk 'NR > 2 {print}' | sed '$d;x' | sed '$d;x' > README.md
