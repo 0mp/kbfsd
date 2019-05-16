@@ -65,30 +65,35 @@ kbfsd_prestart()
 	local _f
 
 	# Make sure that the username is valid.
-	if ! id -u -- "${kbfsd_user}" > /dev/null 2>&1; then
-		err 1 "kbfsd_user is set to '${kbfsd_user}' which is not a valid user."
+	if id -u -- "${kbfsd_user}" > /dev/null 2>&1
+	then :; else
+		err "${?}" "kbfsd_user is set to '${kbfsd_user}' which is not a valid user."
 	fi
 
 	# Attempt to unmount in case there are some leftovers after
 	# previous kbfsfuse.
 	umount "${kbfsd_mountpoint}" > /dev/null 2>&1
 	# Create the mountpoint for the filesystem.
-	if ! mkdir -p -- "${kbfsd_mountpoint}"; then
-		err 1 "Cannot create the '${kbfsd_mountpoint}' directory.'"
+	if mkdir -p -- "${kbfsd_mountpoint}"
+	then :; else
+		err "${?}" "Cannot create the '${kbfsd_mountpoint}' directory.'"
 	fi
-	if ! chown "${kbfsd_user}" "${kbfsd_mountpoint}"; then
-		err 1 "Cannot set ${kbfsd_user} as the owner of ${kbfsd_mountpoint}."
+	if chown "${kbfsd_user}" "${kbfsd_mountpoint}"
+	then :; else
+		err "${?}" "Cannot set ${kbfsd_user} as the owner of ${kbfsd_mountpoint}."
 	fi
 
 	# Make it possible to mount filesystems as a normal user.
-	if ! sysctl vfs.usermount=1 > /dev/null 2>&1; then
-		err 1 "Cannot set vfs.usermount to 1."
+	if sysctl vfs.usermount=1 > /dev/null 2>&1
+	then :; else
+		err "${?}" "Cannot set vfs.usermount to 1."
 	fi
 
 	# Add the specified user account to the opearator group so that it
 	# could use the /dev/fuse device.
-	if ! pw groupmod operator -m "${kbfsd_user}"; then
-		err 1 "Cannot add ${kbfsd_user} to the operator group."
+	if pw groupmod operator -m "${kbfsd_user}"
+	then :; else
+		err "${?}" "Cannot add ${kbfsd_user} to the operator group."
 	fi
 
 	# The Keybase client has to be initiated so that
