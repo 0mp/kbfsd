@@ -31,16 +31,19 @@ RCDIR = ${ETCDIR}/rc.d
 MANDIR = ${DESTDIR}${PREFIX}/man
 MAN5DIR = ${MANDIR}/man5
 
+.PHONY: all
 all: kbfsd
 
 kbfsd:
 	awk -v lb="${LOCALBASE}" '{sub("%%LOCALBASE%%", lb); print}' kbfsd.in > kbfsd
 
+.PHONY: install
 install: kbfsd
 	mkdir -p ${RCDIR}
 	install -m 0755 kbfsd ${RCDIR}/kbfsd
 	mkdir -p ${MAN5DIR}
 	install -m 0555 kbfsd.5 ${MAN5DIR}/kbfsd.5
 
+.PHONY: clean
 clean:
 	rm -f -- kbfsd
