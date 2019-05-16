@@ -34,7 +34,7 @@ MAN5DIR = ${MANDIR}/man5
 .PHONY: all
 all: kbfsd
 
-kbfsd:
+kbfsd: kbfsd.in
 	awk -v lb="${LOCALBASE}" '{sub("%%LOCALBASE%%", lb); print}' kbfsd.in > kbfsd
 
 .PHONY: install
