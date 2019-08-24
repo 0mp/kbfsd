@@ -104,6 +104,23 @@ variables:
 > *kbfsd\_mountpoint*.
 > It cannot be empty.
 
+# INSTALLATION
+
+The easiest way is to just install the
+**kbfsd**
+package via
+pkg(8)
+on
+FreeBSD:
+
+	pkg install kbfsd
+
+**kbfsd**
+can be installed manually with the following command:
+
+	make all
+	make install
+
 # FILES
 
 */home/*${*kbfsd\_user*}*/.config/keybase/kbfsd.*${*kbfsd\_user*}*.pid*
