@@ -35,7 +35,7 @@ MAN5DIR?=	${MANDIR}/man5
 all: kbfsd
 
 kbfsd: kbfsd.in
-	awk -v lb="${LOCALBASE}" '{sub("%%LOCALBASE%%", lb); print}' kbfsd.in > kbfsd
+	sed -e 's|%%LOCALBASE%%|${LOCALBASE}|g' kbfsd.in > kbfsd
 
 .PHONY: install
 install: kbfsd
