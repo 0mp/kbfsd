@@ -1,7 +1,7 @@
 .\"
 .\" SPDX-License-Identifier: BSD-2-Clause
 .\"
-.\" Copyright (c) 2018-2019 Mateusz Piotrowski <0mp@FreeBSD.org>
+.\" Copyright (c) 2018, 2019 Mateusz Piotrowski <0mp@FreeBSD.org>
 .\"
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,7 @@
 .\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 .\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 .\" POSSIBILITY OF SUCH DAMAGE.
-.Dd May 16, 2019
+.Dd August 24, 2019
 .Dt KBFSD 5
 .Os
 .Sh NAME
@@ -126,6 +126,23 @@ The login name of a user, who should own
 .Va kbfsd_mountpoint .
 It cannot be empty.
 .El
+.Sh INSTALLATION
+The easiest way is to just install the
+.Nm
+package via
+.Xr pkg 8
+on
+.Fx :
+.Bd -literal -offset indent
+pkg install kbfsd
+.Ed
+.Pp
+.Nm
+can be installed manually with the following command:
+.Bd -literal -offset indent
+make all
+make install
+.Ed
 .Sh FILES
 .Bl -tag -width "/home/${kbfsd_user}/.config/keybase/kbfsd.${kbfsd_user}.pid" -compact
 .Sm off
