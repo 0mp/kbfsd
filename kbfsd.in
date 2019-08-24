@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 #
-# Copyright (c) 2018-2019 Mateusz Piotrowski <0mp@FreeBSD.org>
+# Copyright (c) 2018, 2019 Mateusz Piotrowski <0mp@FreeBSD.org>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -58,7 +58,7 @@ command_args="-p ${pidfile} %%LOCALBASE%%/bin/kbfsfuse -log-to-file ${kbfsd_moun
 start_precmd="kbfsd_prestart"
 stop_postcmd="kbfsd_poststop"
 
-required_modules='fuse:fusefs'
+required_modules='fusefs'
 
 kbfsd_prestart()
 {
