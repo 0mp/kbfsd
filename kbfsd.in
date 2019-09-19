@@ -62,8 +62,6 @@ required_modules='fuse~fuse'
 
 kbfsd_prestart()
 {
-	local _f
-
 	# Make sure that the username is valid.
 	if pw showuser -n "${kbfsd_user}" > /dev/null 2>&1
 	then :; else
@@ -99,13 +97,11 @@ kbfsd_prestart()
 	# The Keybase client has to be initiated so that
 	# "/home/${kbfsd_user}/.config/keybase/keybased.sock" is present.
 	su -l "${kbfsd_user}" -c "%%LOCALBASE%%/bin/keybase login ${kbfsd_keybase_username}" > /dev/null 2>&1
-	for _f in \
-	    "/home/${kbfsd_user}/.config/keybase/keybased.sock"
-	do
-		if [ ! -S "${_f}" ]; then
-			err 78 "Missing the \"${_f}\" file."
-		fi
-	done
+
+	local _keybased_sock="/home/${kbfsd_user}/.config/keybase/keybased.sock"
+	if [ ! -S "${_keybased_sock}" ]; then
+		err 78 "Missing the \"${_keybased_sock}\" file."
+	fi
 
 	return 0
 }
