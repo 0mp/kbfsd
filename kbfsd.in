@@ -97,12 +97,9 @@ kbfsd_prestart()
 	fi
 
 	# The Keybase client has to be initiated so that
-	# "/home/${kbfsd_user}/.config/keybase/keybased.sock" and
-	# "/home/${kbfsd_user}/.config/keybase/kbfsd.sock" are present.
+	# "/home/${kbfsd_user}/.config/keybase/keybased.sock" is present.
 	su -l "${kbfsd_user}" -c "%%LOCALBASE%%/bin/keybase login ${kbfsd_keybase_username}" > /dev/null 2>&1
-	su -l "${kbfsd_user}" -c "%%LOCALBASE%%/bin/kbfstool stat ${kbfsd_mountpoint} > /dev/null 2>&1"
 	for _f in \
-	    "/home/${kbfsd_user}/.config/keybase/kbfsd.sock" \
 	    "/home/${kbfsd_user}/.config/keybase/keybased.sock"
 	do
 		if [ ! -S "${_f}" ]; then
