@@ -94,6 +94,14 @@ kbfsd_prestart()
 		err "${?}" "Cannot add ${kbfsd_user} to the operator group."
 	fi
 
+	if %%LOCALBASE%%/bin/jq --exit-status \
+		".current_user == ${kbfsd_keybase_username}" \
+		"/home/${kbfsd_user}/.config/keybase/config.json"
+	then
+		err 78 "\"${kbfsd_keybase_username}\" is not logged into Keybase."
+	fi
+
+
 	# The Keybase client has to be initiated so that
 	# "/home/${kbfsd_user}/.config/keybase/keybased.sock" is present.
 	su -l "${kbfsd_user}" -c "%%LOCALBASE%%/bin/keybase login ${kbfsd_keybase_username}" > /dev/null 2>&1
