@@ -103,7 +103,7 @@ kbfsd_prestart()
 	    "/home/${kbfsd_user}/.config/keybase/keybased.sock"
 	do
 		if [ ! -S "${_f}" ]; then
-			err 1 "Missing the \"${_f}\" file."
+			err 78 "Missing the \"${_f}\" file."
 		fi
 	done
 
