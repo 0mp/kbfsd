@@ -65,7 +65,7 @@ kbfsd_prestart()
 	local _f
 
 	# Make sure that the username is valid.
-	if id -u -- "${kbfsd_user}" > /dev/null 2>&1
+	if pw showuser -n "${kbfsd_user}" > /dev/null 2>&1
 	then :; else
 		err "${?}" "kbfsd_user is set to '${kbfsd_user}' which is not a valid user."
 	fi
