@@ -95,9 +95,10 @@ kbfsd_prestart()
 	fi
 
 	if %%LOCALBASE%%/bin/jq --exit-status \
-		".current_user == ${kbfsd_keybase_username}" \
-		"/home/${kbfsd_user}/.config/keybase/config.json"
-	then
+		".current_user == \"${kbfsd_keybase_username}\"" \
+		"/home/${kbfsd_user}/.config/keybase/config.json" |
+		grep true >/dev/null
+	then :; else
 		err 78 "\"${kbfsd_keybase_username}\" is not logged into Keybase."
 	fi
 
