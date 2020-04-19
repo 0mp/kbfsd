@@ -193,3 +193,25 @@ It is recommended to read the service file before setting
 *kbfsd\_env*
 in
 rc.conf(5).
+
+On some
+FreeBSD
+versions older than 13.0 the name of
+fusefs(5)
+might be
+"fuse"
+instead of
+"fusefs".
+As a result,
+**kbfsd**
+might fail to start.
+A potential workaronud is to set
+*required\_modules*
+to an empty string in
+*/usr/local/etc/rc.conf.d/kbfsd*
+and then loading the FUSE kernel module differently
+(e.g., via
+*kld\_list*
+in
+rc.conf(5))
+.
