@@ -30,14 +30,12 @@ ETCDIR?=	${DESTDIR}${PREFIX}/etc
 RCDIR?=		${ETCDIR}/rc.d
 MANDIR?=	${DESTDIR}${PREFIX}/man
 MAN5DIR?=	${MANDIR}/man5
-FUSE?=		fusefs
 
 .PHONY: all
 all: kbfsd
 
 kbfsd: kbfsd.in
 	sed -e 's|%%LOCALBASE%%|${LOCALBASE}|g' \
-		-e 's|%%FUSE%%|${FUSE}|g' \
 		kbfsd.in > kbfsd
 
 .PHONY: install

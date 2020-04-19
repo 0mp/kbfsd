@@ -207,3 +207,25 @@ It is recommended to read the service file before setting
 .Va kbfsd_env
 in
 .Xr rc.conf 5 .
+.Pp
+On some
+.Fx
+versions older than 13.0 the name of
+.Xr fusefs 5
+might be
+.Dq fuse
+instead of
+.Dq fusefs .
+As a result,
+.Nm
+might fail to start.
+A potential workaronud is to set
+.Va required_modules
+to an empty string in
+.Pa /usr/local/etc/rc.conf.d/kbfsd
+and then loading the FUSE kernel module differently
+.Po e.g., via
+.Va kld_list
+in
+.Xr rc.conf 5
+.Pc .

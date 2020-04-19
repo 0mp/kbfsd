@@ -56,7 +56,7 @@ command_args="-p ${pidfile} %%LOCALBASE%%/bin/kbfsfuse -log-to-file ${kbfsd_moun
 start_precmd="kbfsd_prestart"
 stop_postcmd="kbfsd_poststop"
 
-required_modules='%%FUSE%%'
+required_modules='fusefs'
 
 kbfsd_prestart()
 {
