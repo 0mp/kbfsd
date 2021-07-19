@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 #
-# Copyright (c) 2018-2020 Mateusz Piotrowski <0mp@FreeBSD.org>
+# Copyright (c) 2018-2021 Mateusz Piotrowski <0mp@FreeBSD.org>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ rcvar='kbfsd_enable'
 # Default settings.
 : "${kbfsd_enable:=no}"
 : "${kbfsd_mountpoint:=/keybase}"
-: "${kbfsd_user:?'kbfsd_user cannot be empty.'}"
+: "${kbfsd_user:?kbfsd_user cannot be empty.}"
 # It has to be done manually because the su(1) mechanism present in rc.subr(8)
 # uses the "-m" flag, which causes kbfsfuse to look for files in root's
 # directories instead of the directories of ${kbfsd_user}.
