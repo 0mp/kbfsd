@@ -6,19 +6,19 @@
 
 # SYNOPSIS
 
-The required
+Required
 rc.conf(5)
 variables:
 
-*kbfsd\_enable*="`NO`"  
-*kbfsd\_user*="*user*"
+	kbfsd_enable="YES"
+	kbfsd_user="beastie"
 
 Optional
 rc.conf(5)
 variables:
 
-*kbfsd\_keybase\_username*="`${`*kbfsd\_user*`}`"  
-*kbfsd\_mountpoint*="*/keybase*"
+	kbfsd_keybase_username="${kbfsd_user}"
+	kbfsd_mountpoint="/keybase"
 
 # DESCRIPTION
 
@@ -35,7 +35,7 @@ otherwise.
 does not start automatically even when
 *kbfsd\_enable*
 is set to
-"`YES`"
+'`YES`'
 in
 rc.conf(5).
 See the
@@ -44,8 +44,8 @@ section for more details.
 
 **kbfsd**
 has to configure some bits of the system in order to mount KBFS as
-*kbfsd\_user*.
-*kbfsd\_mountpoint*
+*kbfsd_user*.
+*kbfsd_mountpoint*
 is created and
 the
 sysctl(8)
@@ -54,11 +54,11 @@ tunable
 is set to
 "1"
 so that
-*kbfsd\_user*
+*kbfsd_user*
 could mount
-*kbfsd\_mountpoint*.
+*kbfsd_mountpoint*.
 Then
-*kbfsd\_user*
+*kbfsd_user*
 is added to the
 "operator"
 group to be able to use the
@@ -68,41 +68,41 @@ Finally,
 **kbfsd**
 attempts to spin off the Keybase server and create required socket files.
 Note that this step requires
-*kbfsd\_user*
+*kbfsd_user*
 to be able to log in as
-*kbfsd\_keybase\_username*.
+*kbfsd_keybase_username*.
 This should be possible once
-*kbfsd\_user*
+*kbfsd_user*
 registers a device with
-"`keybase device add`".
+'`keybase device add`'.
 
 **kbfsd**
 may be controlled with the following
 rc.conf(5)
 variables:
 
-*kbfsd\_enable*
+*kbfsd_enable*
 
-> (*bool*, default: "`NO`")
-> Enable
-> **kbfsd**.
+	(*bool*, default: '`NO`')
+	Enable
+	**kbfsd**.
 
-*kbfsd\_keybase\_username*
+*kbfsd_keybase_username*
 
-> (*str*, default: *kbfsd\_user*)
-> The username used to log into Keybase.
+	(*str*, default: *kbfsd_user*)
+	The username used to log into Keybase.
 
-*kbfsd\_mountpoint*
+*kbfsd_mountpoint*
 
-> (*str*, default: "`/keybase`")
-> The directory where KBFS should be mounted.
+	(*str*, default: '`/keybase`')
+	The directory where KBFS should be mounted.
 
-*kbfsd\_user*
+*kbfsd_user*
 
-> (*str*, no defaults)
-> The login name of a user, who should own
-> *kbfsd\_mountpoint*.
-> It cannot be empty.
+	(*str*, no defaults)
+	The login name of a user, who should own
+	*kbfsd_mountpoint*.
+	It cannot be empty.
 
 # INSTALLATION
 
@@ -123,16 +123,16 @@ can be installed manually with the following command:
 
 # FILES
 
-*/home/*${*kbfsd\_user*}*/.config/keybase/kbfsd.*${*kbfsd\_user*}*.pid*
+*/home/*${*kbfsd_user*}*/.config/keybase/kbfsd.*${*kbfsd_user*}*.pid*
 
-> PID file.
+	PID file.
 
 # EXIT STATUS
 
 The
 **kbfsd**
 daemon
-exits 0 on success, and &gt;0 if an error occurs.
+exits 0 on success, and >0 if an error occurs.
 
 # SEE ALSO
 
@@ -145,7 +145,7 @@ rc(8)
 The
 **kbfsd**
 daemon and its manual page were written by
-Mateusz Piotrowski &lt;[0mp@FreeBSD.org](mailto:0mp@FreeBSD.org)&gt;.
+Mateusz Piotrowski <[0mp@FreeBSD.org](mailto:0mp@FreeBSD.org)>.
 
 # CAVEATS
 
@@ -154,13 +154,18 @@ is
 *not*
 started automatically together with other daemons during boot because it uses
 the
-"`nostart`"
+'`nostart`'
 KEYWORD
 (see rc(8) for details).
 The reason is that in order to reliably mount KBFS the user has to establish
 a session with the Keybase server first.
 This is done by calling:
-"`keybase login` *username*".
+'`keybase login username`'
+(where
+*username*
+is the same as
+*kbfsd_keybase_username*)
+.
 Unfortunately, this command happens to block the booting process from time to
 time, which is unacceptable.
 
@@ -184,13 +189,13 @@ phase
 Currently,
 **kbfsd**
 uses
-*kbfsd\_env*
+*kbfsd_env*
 internally to set the
 `HOME`
 environmental variable to the home directory of
-*kbfsd\_user*.
+*kbfsd_user*.
 It is recommended to read the service file before setting
-*kbfsd\_env*
+*kbfsd_env*
 in
 rc.conf(5).
 
@@ -206,12 +211,12 @@ As a result,
 **kbfsd**
 might fail to start.
 A potential workaronud is to set
-*required\_modules*
+*required_modules*
 to an empty string in
 */usr/local/etc/rc.conf.d/kbfsd*
 and then loading the FUSE kernel module differently
 (e.g., via
-*kld\_list*
+*kld_list*
 in
 rc.conf(5))
 .
