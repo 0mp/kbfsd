@@ -60,7 +60,7 @@ otherwise.
 does not start automatically even when
 .Va kbfsd_enable
 is set to
-.Dq Li YES
+.Ql YES
 in
 .Xr rc.conf 5 .
 See the
@@ -99,7 +99,7 @@ to be able to log in as
 This should be possible once
 .Va kbfsd_user
 registers a device with
-.Dq Li keybase device add .
+.Ql keybase device add .
 .Pp
 .Nm
 may be controlled with the following
@@ -107,14 +107,14 @@ may be controlled with the following
 variables:
 .Bl -tag -width kbfsd_keybase_username
 .It Va kbfsd_enable
-.Pq Vt bool , No default: Dq Li NO
+.Pq Vt bool , No default: Ql NO
 Enable
 .Nm .
 .It Va kbfsd_keybase_username
 .Pq Vt str , No default: Va kbfsd_user
 The username used to log into Keybase.
 .It Va kbfsd_mountpoint
-.Pq Vt str , No default: Dq Li /keybase
+.Pq Vt str , No default: Ql /keybase
 The directory where KBFS should be mounted.
 .It Va kbfsd_user
 .Pq Vt str , No no defaults
@@ -166,13 +166,18 @@ is
 .Em not
 started automatically together with other daemons during boot because it uses
 the
-.Dq Li nostart
+.Ql nostart
 KEYWORD
 .Pq see Xr rc 8 for details .
 The reason is that in order to reliably mount KBFS the user has to establish
 a session with the Keybase server first.
 This is done by calling:
-.Dq Li keybase login Ar username .
+.Ql keybase login username
+.Po where
+.Ar username
+is the same as
+.Ar kbfsd_keybase_username
+.Pc .
 Unfortunately, this command happens to block the booting process from time to
 time, which is unacceptable.
 .Sh BUGS
